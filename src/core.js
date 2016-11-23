@@ -36,6 +36,8 @@ export const defaults = {
 	filterBy: [],
 	groupBy: [],
 	retina: false,
+	rem: false,
+	remToPxRatio: 16,
 	hooks: {
 		onSaveSpritesheet: null,
 		onUpdateRule: null
@@ -149,7 +151,8 @@ export function extractImages(root, opts, result) {
 			ratio: 1,
 			groups: [],
 			token: '',
-			styleFilePath: styleFilePath
+			styleFilePath: styleFilePath,
+			opts: opts
 		};
 
 		// Manipulate only rules with image in them
@@ -430,11 +433,12 @@ export function updateReferences(root, opts, images, spritesheets) {
  * @return
  */
 export function updateRule(rule, token, image) {
-	const { retina, ratio, coords, spriteUrl, spriteWidth, spriteHeight } = image;
+	const { retina, ratio, coords, spriteUrl, spriteWidth, spriteHeight, opts } = image;
 	const posX = -1 * Math.abs(coords.x / ratio);
 	const posY = -1 * Math.abs(coords.y / ratio);
 	const sizeX = spriteWidth / ratio;
 	const sizeY = spriteHeight / ratio;
+	const cssUnit = opts.rem ? 'rem' : 'px';
 
 	const backgroundImageDecl = postcss.decl({
 		prop: 'background-image',
@@ -443,16 +447,16 @@ export function updateRule(rule, token, image) {
 
 	const backgroundPositionDecl = postcss.decl({
 		prop: 'background-position',
-		value: `${posX}px ${posY}px`
+		value: posX/(opts.rem ? opts.remToPxRatio : 1) + `${cssUnit} ` + posY/(opts.rem ? opts.remToPxRatio : 1) + `${cssUnit}`
 	});
 
 	rule.insertAfter(token, backgroundImageDecl);
 	rule.insertAfter(backgroundImageDecl, backgroundPositionDecl);
 
-	if (retina) {
+	if (retina || opts.rem) {
 		const backgroundSizeDecl = postcss.decl({
 			prop: 'background-size',
-			value: `${sizeX}px ${sizeY}px`
+			value: sizeX/(opts.rem ? opts.remToPxRatio : 1) + `${cssUnit} ` + sizeY/(opts.rem ? opts.remToPxRatio : 1) + `${cssUnit}`
 		});
 
 		rule.insertAfter(backgroundPositionDecl, backgroundSizeDecl);

@@ -16,6 +16,12 @@
 
 ----
 
+### Changelog: diff from origin version
+
+. add `rem` and `remToPxRatio` options to fit rem stage
+
+----
+
 ### Usage
 
 ```javascript
@@ -108,6 +114,20 @@ Built-in filters:
 > Defines whether or not to search for retina mark in the filename.
 
 - Default: `false`
+- Required: `false`
+
+###### rem
+
+> Defines whether or not to use rem
+
+- Default: `false`
+- Required: `false`
+
+###### remToPxRatio
+
+> Defines how many pixels equal to 1 rem css unit ( It's valid when `rem` is `true` )
+
+- Default: `16`
 - Required: `false`
 
 ###### hooks
